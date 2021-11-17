@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 )
 
@@ -23,17 +24,13 @@ type Driver struct {
 
 func driver_web(w http.ResponseWriter, r *http.Request) {
 
+	db := OpenDB()
+
 	if r.Header.Get("Content-type") == "application/json" {
 
-		// if r.Method == "GET" {
-		// 	if _, ok := drivers[params["D_Username"]]; ok {
-		// 		json.NewEncoder(w).Encode(
-		// 			drivers[params["D_Username"]])
-		// 	} else {
-		// 		w.WriteHeader(http.StatusNotFound)
-		// 		w.Write([]byte("404 - No driver found"))
-		// 	}
-		// }
+		if r.Method == "GET" {
+			GetRecords(db)
+		}
 
 		// POST is for creating new driver
 		if r.Method == "POST" {
@@ -53,6 +50,11 @@ func driver_web(w http.ResponseWriter, r *http.Request) {
 					w.Write([]byte("422 - Please supply driver information in JSON format"))
 					return
 				}
+
+				InsertDriver(db, newDriver.D_Username, newDriver.D_Password, newDriver.D_FirstName, newDriver.D_LastName, newDriver.D_MobileNo, newDriver.D_EmailAddr, newDriver.D_NRIC, newDriver.D_CarLicenseNo)
+
+				// defer the close till after the main function has finished executing
+				defer db.Close()
 
 			} else {
 				w.WriteHeader(http.StatusUnprocessableEntity)
