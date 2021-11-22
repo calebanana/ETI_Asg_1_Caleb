@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"net/http"
 
@@ -22,14 +21,23 @@ type Driver struct {
 	D_CarLicenseNo string
 }
 
-func driver_web(w http.ResponseWriter, r *http.Request) {
+type Passenger struct {
+	P_Username  string
+	P_Password  string
+	P_FirstName string
+	P_LastName  string
+	P_MobileNo  string
+	P_EmailAddr string
+}
+
+func driver(w http.ResponseWriter, r *http.Request) {
 
 	db := OpenDB()
 
 	if r.Method == "GET" {
 		params := mux.Vars(r)
 
-		driver_record := GetRecord(db, params["username"])
+		driver_record := GetDriver(db, params["username"])
 
 		json.NewEncoder(w).Encode(driver_record)
 	}
@@ -67,17 +75,56 @@ func driver_web(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func passenger_web(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("../Passenger_Web/passenger_web.html"))
+func passenger(w http.ResponseWriter, r *http.Request) {
 
-	tmpl.Execute(w, nil)
+	db := OpenDB()
+
+	if r.Method == "GET" {
+		params := mux.Vars(r)
+
+		passenger_record := GetPassenger(db, params["username"])
+
+		json.NewEncoder(w).Encode(passenger_record)
+	}
+
+	if r.Header.Get("Content-type") == "application/json" {
+		// POST is for creating new driver
+		if r.Method == "POST" {
+
+			// read the string sent to the service
+			var newPassenger Passenger
+			reqBody, err := ioutil.ReadAll(r.Body)
+
+			if err == nil {
+				// convert JSON to object
+				json.Unmarshal(reqBody, &newPassenger)
+
+				fmt.Println(newPassenger)
+
+				if newPassenger.P_Username == "" {
+					w.WriteHeader(http.StatusUnprocessableEntity)
+					w.Write([]byte("422 - Please supply driver information in JSON format"))
+					return
+				}
+
+				InsertPassenger(db, newPassenger.P_Username, newPassenger.P_Password, newPassenger.P_FirstName, newPassenger.P_LastName, newPassenger.P_MobileNo, newPassenger.P_EmailAddr)
+
+				// defer the close till after the main function has finished executing
+				defer db.Close()
+
+			} else {
+				w.WriteHeader(http.StatusUnprocessableEntity)
+				w.Write([]byte("422 - Please driver information in JSON format"))
+			}
+		}
+	}
 }
 
 func main() {
 	router := mux.NewRouter()
-	router.HandleFunc("/api/driver/{username}", driver_web).Methods("GET", "PUT", "POST")
+	router.HandleFunc("/api/driver/{username}", driver).Methods("GET", "PUT", "POST")
 
-	router.HandleFunc("/passenger", passenger_web)
+	router.HandleFunc("/api/passenger/{username}", passenger).Methods("GET", "PUT", "POST")
 
 	fmt.Println("Listening on port 5000")
 	http.ListenAndServe(":5000", router)
