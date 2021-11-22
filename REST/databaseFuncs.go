@@ -8,8 +8,6 @@ import (
 )
 
 func GetRecord(db *sql.DB, username string) Driver {
-	//query := "SELECT * FROM BackRidesDB.Driver WHERE D_Username = '" + username + "'"
-
 	var driver Driver
 	err := db.QueryRow("SELECT * FROM BackRidesDB.Driver WHERE D_Username = ?", username).Scan(&driver.D_Username, &driver.D_Password, &driver.D_FirstName, &driver.D_LastName, &driver.D_MobileNo, &driver.D_EmailAddr, &driver.D_NRIC, &driver.D_CarLicenseNo)
 

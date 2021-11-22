@@ -26,8 +26,14 @@ var currentDriver Driver
 
 const baseURL string = "http://localhost:5000/api/driver"
 
-func createAccount(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("create_account.html"))
+func index(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("index.html"))
+
+	tmpl.Execute(w, nil)
+}
+
+func driverNewAccount(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("driver_new_account.html"))
 
 	if r.Method != http.MethodPost {
 		tmpl.Execute(w, nil)
@@ -103,17 +109,22 @@ func driverLogin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func driverMainPage(w http.ResponseWriter, r *http.Request) {
+func driverMain(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("driver_main.html"))
 	tmpl.Execute(w, currentDriver)
 }
 
 func main() {
 	router := mux.NewRouter()
-	router.HandleFunc("/", driverLogin)
+	router.HandleFunc("/", index)
+
 	router.HandleFunc("/driver_login", driverLogin)
-	router.HandleFunc("/create_account", createAccount)
-	router.HandleFunc("/driver_main", driverMainPage)
+	router.HandleFunc("/driver_new_account", driverNewAccount)
+	router.HandleFunc("/driver_main", driverMain)
+
+	//router.HandleFunc("/passenger_login", passengerLogin)
+	//router.HandleFunc("/passenger_new_account", passengerNewAccount)
+	//router.HandleFunc("/passenger_main", passengerMain)
 
 	http.ListenAndServe(":80", router)
 }

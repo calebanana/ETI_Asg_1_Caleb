@@ -9,8 +9,7 @@
 <body>
     <h1>Welcome to BackRides!</h1>
     
-    <h2>Create a Driver Account</h2>
-    
+    <h2>Create Driver Account</h2>
     <form method="POST">
         <label>Username</label> <br/>
         <input name="d_username" type="text"> <br/><br/>
@@ -30,11 +29,8 @@
         <input name="d_carlicenseno" type="text"> <br/><br/>
         <input type="submit">
     </form>
-
-    <h1>form data</h1>
-    <h5>{{.D_Username}}</h5>
-    <h5>{{.D_Password}}</h5>
-    <h5>{{.D_NRIC}}</h5>
-    <h5>{{.D_MobileNo}}</h5>
+   
+    <h5>Already have an account? Log in <a href="/driver_login">here</a>.</h5>
+    <a href="/">Back to main page</a>
 </body>
 </html>
