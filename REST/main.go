@@ -26,12 +26,15 @@ func driver_web(w http.ResponseWriter, r *http.Request) {
 
 	db := OpenDB()
 
+	if r.Method == "GET" {
+		params := mux.Vars(r)
+
+		driver_record := GetRecord(db, params["username"])
+
+		json.NewEncoder(w).Encode(driver_record)
+	}
+
 	if r.Header.Get("Content-type") == "application/json" {
-
-		if r.Method == "GET" {
-			GetRecords(db)
-		}
-
 		// POST is for creating new driver
 		if r.Method == "POST" {
 

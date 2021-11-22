@@ -7,29 +7,24 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func GetRecords(db *sql.DB) {
-	results, err := db.Query("SELECT * FROM backridesdb.Driver")
+func GetRecord(db *sql.DB, username string) Driver {
+	//query := "SELECT * FROM BackRidesDB.Driver WHERE D_Username = '" + username + "'"
+
+	var driver Driver
+	err := db.QueryRow("SELECT * FROM BackRidesDB.Driver WHERE D_Username = ?", username).Scan(&driver.D_Username, &driver.D_Password, &driver.D_FirstName, &driver.D_LastName, &driver.D_MobileNo, &driver.D_EmailAddr, &driver.D_NRIC, &driver.D_CarLicenseNo)
 
 	if err != nil {
 		panic(err.Error())
 	}
 
-	for results.Next() {
-		// map this type to the record in the table
-		var driver Driver
-		err = results.Scan(&driver.D_Username, &driver.D_Password, &driver.D_FirstName, &driver.D_LastName, &driver.D_MobileNo, &driver.D_EmailAddr, &driver.D_NRIC, &driver.D_CarLicenseNo)
-		if err != nil {
-			panic(err.Error())
-		}
+	fmt.Println(driver.D_Username, driver.D_Password, driver.D_FirstName, driver.D_LastName, driver.D_MobileNo, driver.D_EmailAddr, driver.D_NRIC, driver.D_CarLicenseNo)
 
-		fmt.Println(driver.D_Username, driver.D_Password, driver.D_FirstName, driver.D_LastName,
-			driver.D_MobileNo, driver.D_EmailAddr, driver.D_NRIC, driver.D_CarLicenseNo)
-	}
+	return driver
 }
 
 func OpenDB() *sql.DB {
 	// Use mysql as driverName and a valid DSN as dataSourceName:
-	db, err := sql.Open("mysql", "root:E50Misweakaf@tcp(127.0.0.1:3306)/backridesdb")
+	db, err := sql.Open("mysql", "root:E50Misweakaf@tcp(127.0.0.1:3306)/BackRidesDB")
 
 	// handle error
 	if err != nil {
