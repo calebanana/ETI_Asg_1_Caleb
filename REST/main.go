@@ -54,8 +54,6 @@ func driver(w http.ResponseWriter, r *http.Request) {
 				// convert JSON to object
 				json.Unmarshal(reqBody, &newDriver)
 
-				fmt.Println(newDriver)
-
 				if newDriver.D_Username == "" {
 					w.WriteHeader(http.StatusUnprocessableEntity)
 					w.Write([]byte("422 - Please supply driver information in JSON format"))

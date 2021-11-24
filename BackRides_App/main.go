@@ -11,6 +11,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const driverURL string = "http://localhost:3001"
+const passengerURL string = "http://localhost:3002"
+
+var currentDriver Driver
+var currentPassenger Passenger
+
 type Driver struct {
 	D_Username     string
 	D_Password     string
@@ -31,14 +37,8 @@ type Passenger struct {
 	P_EmailAddr string
 }
 
-var currentDriver Driver
-var currentPassenger Passenger
-
-const baseURL string = "http://localhost:5000/api"
-
 func index(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("index.html"))
-
 	tmpl.Execute(w, nil)
 }
 
@@ -60,7 +60,9 @@ func driverNewAccount(w http.ResponseWriter, r *http.Request) {
 
 		driver_data_json, _ := json.Marshal(new_driver_data)
 
-		response, err := http.Post(baseURL+"/driver/"+new_driver_data.D_Username, "application/json", bytes.NewBuffer(driver_data_json))
+		response, err := http.Post(driverURL+"/driver_new_account", "application/json", bytes.NewBuffer(driver_data_json))
+
+		fmt.Println("sent to driver")
 
 		if err != nil {
 			fmt.Printf("The HTTP request failed with error %s\n", err)
@@ -69,7 +71,6 @@ func driverNewAccount(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(response.StatusCode)
 			fmt.Println(string(data))
 			response.Body.Close()
-			currentDriver = new_driver_data
 			http.Redirect(w, r, "/driver_main", http.StatusFound)
 		}
 	}
@@ -87,30 +88,24 @@ func driverLogin(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Println(driver_login_data)
 
-		url := baseURL
-		username := driver_login_data["Username"]
-		if username != "" {
-			url = baseURL + "/driver/" + username
-		}
+		driver_login_data_json, _ := json.Marshal(driver_login_data)
 
-		response, err := http.Get(url)
+		response, err := http.Post(driverURL+"/driver_login", "application/json", bytes.NewBuffer(driver_login_data_json))
+
+		fmt.Println("sent to driver")
 
 		if err != nil {
 			fmt.Printf("The HTTP request failed with error %s\n", err)
 		} else {
 			data, _ := ioutil.ReadAll(response.Body)
+			var retrievedDriver Driver
+			_ = json.Unmarshal(data, &retrievedDriver)
 
-			var retrieved_driver Driver
-			_ = json.Unmarshal(data, &retrieved_driver)
-
-			fmt.Println(retrieved_driver)
-
-			if driver_login_data["Password"] == retrieved_driver.D_Password {
-				currentDriver = retrieved_driver
-				fmt.Println("YEET")
+			if retrievedDriver.D_Username != "" {
 				http.Redirect(w, r, "/driver_main", http.StatusFound)
+				fmt.Println("driver is present")
 			} else {
-				fmt.Println("fail")
+				fmt.Println("no driver")
 				http.Redirect(w, r, "/driver_login", http.StatusFound)
 			}
 			response.Body.Close()
@@ -119,8 +114,25 @@ func driverLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func driverMain(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("driver_main.html"))
-	tmpl.Execute(w, currentDriver)
+	if r.Method == "GET" {
+		tmpl := template.Must(template.ParseFiles("driver_main.html"))
+
+		response, err := http.Get(driverURL + "/driver_main")
+
+		if err != nil {
+			fmt.Printf("The HTTP request failed with error %s\n", err)
+		} else {
+			data, _ := ioutil.ReadAll(response.Body)
+
+			var retrievedDriver Driver
+			_ = json.Unmarshal(data, &retrievedDriver)
+
+			fmt.Println("retrieved from driver: ", retrievedDriver)
+			currentDriver = retrievedDriver
+		}
+
+		tmpl.Execute(w, currentDriver)
+	}
 }
 
 func passengerNewAccount(w http.ResponseWriter, r *http.Request) {
@@ -139,7 +151,9 @@ func passengerNewAccount(w http.ResponseWriter, r *http.Request) {
 
 		passenger_data_json, _ := json.Marshal(new_passenger_data)
 
-		response, err := http.Post(baseURL+"/passenger/"+new_passenger_data.P_Username, "application/json", bytes.NewBuffer(passenger_data_json))
+		response, err := http.Post(passengerURL+"/passenger_new_account", "application/json", bytes.NewBuffer(passenger_data_json))
+
+		fmt.Println("sent to passenger")
 
 		if err != nil {
 			fmt.Printf("The HTTP request failed with error %s\n", err)
@@ -148,7 +162,6 @@ func passengerNewAccount(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(response.StatusCode)
 			fmt.Println(string(data))
 			response.Body.Close()
-			currentPassenger = new_passenger_data
 			http.Redirect(w, r, "/passenger_main", http.StatusFound)
 		}
 	}
@@ -166,29 +179,24 @@ func passengerLogin(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Println(passenger_login_data)
 
-		url := baseURL
-		username := passenger_login_data["Username"]
-		if username != "" {
-			url = baseURL + "/passenger/" + username
-		}
+		passenger_login_data_json, _ := json.Marshal(passenger_login_data)
 
-		response, err := http.Get(url)
+		response, err := http.Post(passengerURL+"/passenger_login", "application/json", bytes.NewBuffer(passenger_login_data_json))
+
+		fmt.Println("sent to passenger")
 
 		if err != nil {
 			fmt.Printf("The HTTP request failed with error %s\n", err)
 		} else {
 			data, _ := ioutil.ReadAll(response.Body)
+			var retrievedPassenger Passenger
+			_ = json.Unmarshal(data, &retrievedPassenger)
 
-			var retrieved_passenger Passenger
-			_ = json.Unmarshal(data, &retrieved_passenger)
-
-			fmt.Println(retrieved_passenger)
-
-			if passenger_login_data["Password"] == retrieved_passenger.P_Password {
-				currentPassenger = retrieved_passenger
+			if retrievedPassenger.P_Username != "" {
 				http.Redirect(w, r, "/passenger_main", http.StatusFound)
+				fmt.Println("passenger is present")
 			} else {
-				fmt.Println("fail")
+				fmt.Println("no passenger")
 				http.Redirect(w, r, "/passenger_login", http.StatusFound)
 			}
 			response.Body.Close()
@@ -197,8 +205,25 @@ func passengerLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func passengerMain(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("passenger_main.html"))
-	tmpl.Execute(w, currentPassenger)
+	if r.Method == "GET" {
+		tmpl := template.Must(template.ParseFiles("passenger_main.html"))
+
+		response, err := http.Get(passengerURL + "/passenger_main")
+
+		if err != nil {
+			fmt.Printf("The HTTP request failed with error %s\n", err)
+		} else {
+			data, _ := ioutil.ReadAll(response.Body)
+
+			var retrievedPassenger Passenger
+			_ = json.Unmarshal(data, &retrievedPassenger)
+
+			fmt.Println("retrieved from driver: ", retrievedPassenger)
+			currentPassenger = retrievedPassenger
+		}
+
+		tmpl.Execute(w, currentPassenger)
+	}
 }
 
 func main() {
@@ -213,5 +238,5 @@ func main() {
 	router.HandleFunc("/passenger_login", passengerLogin)
 	router.HandleFunc("/passenger_main", passengerMain)
 
-	http.ListenAndServe(":80", router)
+	http.ListenAndServe(":3000", router)
 }
