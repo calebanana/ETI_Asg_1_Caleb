@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackRides Passenger</title>
+</head>
+<body>
+    <h1>Edit Passenger Account</h1>
+    <form method="POST">
+        <label>Username</label> <br/>
+        <input name="p_new_username" type="text" value={{.P_Username}}> <br/><br/>
+        <label>Password</label><br/>
+        <input name="p_new_password" type="password" value={{.P_Password}}> <br/><br/>
+        <label>First Name</label><br/>
+        <input name="p_new_firstname" type="text" value={{.P_FirstName}}> <br/><br/>
+        <label>Last Name</label><br/>
+        <input name="p_new_lastname" type="text" value={{.P_LastName}}> <br/><br/>
+        <label>Mobile Number</label><br/>
+        <input name="p_new_mobileno" type="text" value={{.P_MobileNo}}> <br/><br/>
+        <label>Email Address</label><br/>
+        <input name="p_new_emailaddr" type="email" value={{.P_EmailAddr}}> <br/><br/>
+        <input type="submit">
+    </form>
+
+    <a href="/passenger_main">
+        <button>Back to Main Page</button>
+    </a>
+</body>
+</html>

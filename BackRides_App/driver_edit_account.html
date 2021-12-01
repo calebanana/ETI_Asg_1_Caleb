@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackRides Driver</title>
+</head>
+<body>
+    <h1>Edit Driver Account</h1>
+    <form method="POST">
+        <label>Username</label> <br/>
+        <input name="d_new_username" type="text" value={{.D_Username}}> <br/><br/>
+        <label>Password</label><br/>
+        <input name="d_new_password" type="password" value={{.D_Password}}> <br/><br/>
+        <label>First Name</label><br/>
+        <input name="d_new_firstname" type="text" value={{.D_FirstName}}> <br/><br/>
+        <label>Last Name</label><br/>
+        <input name="d_new_lastname" type="text" value={{.D_LastName}}> <br/><br/>
+        <label>Mobile Number</label><br/>
+        <input name="d_new_mobileno" type="text" value={{.D_MobileNo}}> <br/><br/>
+        <label>Email Address</label><br/>
+        <input name="d_new_emailaddr" type="email" value={{.D_EmailAddr}}> <br/><br/>
+        <label>NRIC</label><br/>
+        <input name="d_new_nric" type="email" value={{.D_NRIC}}> <br/><br/>
+        <label>Car License No</label><br/>
+        <input name="d_new_carlicenseno" type="email" value={{.D_CarLicenseNo}}> <br/><br/>
+        <input type="submit">
+    </form>
+
+    <a href="/driver_main">
+        <button>Back to Main Page</button>
+    </a>
+</body>
+</html>
