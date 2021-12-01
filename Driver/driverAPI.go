@@ -24,11 +24,11 @@ type Driver struct {
 func driver(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	db := OpenDB()
-
 	if r.Method == "GET" {
 
 		kv := r.URL.Query()
+
+		db := OpenDB()
 		driver_record := GetDriver(db, params["username"])
 
 		if driver_record.D_Password == kv["password"][0] {
@@ -38,19 +38,19 @@ func driver(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write([]byte("401 - Unauthorised"))
 		}
-
+		defer db.Close()
+	} else if r.Method == "DELETE" {
+		w.WriteHeader(http.StatusUnavailableForLegalReasons)
+		w.Write([]byte("451 - Unable to delete account for legal reasons"))
 	}
 
 	if r.Header.Get("Content-type") == "application/json" {
-		// POST is for creating new driver
 		if r.Method == "POST" {
 
-			// read the string sent to the service
 			var newDriver Driver
 			reqBody, err := ioutil.ReadAll(r.Body)
 
 			if err == nil {
-				// convert JSON to object
 				json.Unmarshal(reqBody, &newDriver)
 
 				if newDriver.D_Username == "" {
@@ -59,16 +59,34 @@ func driver(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
-				//InsertDriver(db, newDriver.D_Username, newDriver.D_Password, newDriver.D_FirstName, newDriver.D_LastName, newDriver.D_MobileNo, newDriver.D_EmailAddr, newDriver.D_NRIC, newDriver.D_CarLicenseNo)
+				db := OpenDB()
+				InsertDriver(db, newDriver.D_Username, newDriver.D_Password, newDriver.D_FirstName, newDriver.D_LastName, newDriver.D_MobileNo, newDriver.D_EmailAddr, newDriver.D_NRIC, newDriver.D_CarLicenseNo)
 
 				fmt.Println("inserted driver", params["username"])
-
-				// defer the close till after the main function has finished executing
 				defer db.Close()
-
 			} else {
 				w.WriteHeader(http.StatusUnprocessableEntity)
 				w.Write([]byte("422 - Please provide driver information in JSON format"))
+			}
+		} else if r.Method == "PUT" {
+			var editDriver Driver
+			reqBody, err := ioutil.ReadAll(r.Body)
+
+			if err == nil {
+				json.Unmarshal(reqBody, &editDriver)
+
+				if editDriver.D_Username == "" {
+					w.WriteHeader(http.StatusUnprocessableEntity)
+					w.Write([]byte("422 - Please supply passenger information in JSON format"))
+					return
+				}
+
+				db := OpenDB()
+				UpdateDriver(db, editDriver.D_Username, editDriver.D_Password, editDriver.D_FirstName, editDriver.D_LastName, editDriver.D_MobileNo, editDriver.D_EmailAddr, editDriver.D_NRIC, editDriver.D_CarLicenseNo)
+
+				fmt.Println(editDriver)
+				fmt.Println("updated driver", params["username"])
+				defer db.Close()
 			}
 		}
 	}

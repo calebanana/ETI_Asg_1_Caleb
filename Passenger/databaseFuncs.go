@@ -44,3 +44,15 @@ func InsertPassenger(db *sql.DB, username string, password string, firstname str
 		fmt.Println("Passenger added")
 	}
 }
+
+func UpdatePassenger(db *sql.DB, username string, password string, firstname string, lastname string, mobileno string, emailaddr string) {
+	query := fmt.Sprintf("UPDATE Passenger SET P_Password = '%s', P_FirstName = '%s', P_LastName = '%s', P_MobileNo = '%s', P_EmailAddr = '%s' WHERE P_Username = '%s'", password, firstname, lastname, mobileno, emailaddr, username)
+
+	_, err := db.Query(query)
+
+	if err != nil {
+		panic(err.Error())
+	} else {
+		fmt.Println("Passenger updated")
+	}
+}

@@ -22,11 +22,10 @@ type Passenger struct {
 func passenger(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	db := OpenDB()
-
 	if r.Method == "GET" {
-
 		kv := r.URL.Query()
+
+		db := OpenDB()
 		passenger_record := GetPassenger(db, params["username"])
 
 		if passenger_record.P_Password == kv["password"][0] {
@@ -36,19 +35,17 @@ func passenger(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write([]byte("401 - Unauthorised"))
 		}
-
+	} else if r.Method == "DELETE" {
+		w.WriteHeader(http.StatusUnavailableForLegalReasons)
+		w.Write([]byte("451 - Unable to delete account for legal reasons"))
 	}
 
 	if r.Header.Get("Content-type") == "application/json" {
-		// POST is for creating new passenger
 		if r.Method == "POST" {
-
-			// read the string sent to the service
 			var newPassenger Passenger
 			reqBody, err := ioutil.ReadAll(r.Body)
 
 			if err == nil {
-				// convert JSON to object
 				json.Unmarshal(reqBody, &newPassenger)
 
 				if newPassenger.P_Username == "" {
@@ -57,11 +54,34 @@ func passenger(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
-				//InsertPassenger(db, newPassenger.P_Username, newPassenger.P_Password, newPassenger.P_FirstName, newPassenger.P_LastName, newPassenger.P_MobileNo, newPassenger.P_EmailAddr)
+				db := OpenDB()
+				InsertPassenger(db, newPassenger.P_Username, newPassenger.P_Password, newPassenger.P_FirstName, newPassenger.P_LastName, newPassenger.P_MobileNo, newPassenger.P_EmailAddr)
 
 				fmt.Println("inserted passenger", params["username"])
+				defer db.Close()
 
-				// defer the close till after the main function has finished executing
+			} else {
+				w.WriteHeader(http.StatusUnprocessableEntity)
+				w.Write([]byte("422 - Please provide passenger information in JSON format"))
+			}
+		} else if r.Method == "PUT" {
+			var editPassenger Passenger
+			reqBody, err := ioutil.ReadAll(r.Body)
+
+			if err == nil {
+				json.Unmarshal(reqBody, &editPassenger)
+
+				if editPassenger.P_Username == "" {
+					w.WriteHeader(http.StatusUnprocessableEntity)
+					w.Write([]byte("422 - Please supply passenger information in JSON format"))
+					return
+				}
+
+				db := OpenDB()
+				UpdatePassenger(db, editPassenger.P_Username, editPassenger.P_Password, editPassenger.P_FirstName, editPassenger.P_LastName, editPassenger.P_MobileNo, editPassenger.P_EmailAddr)
+
+				fmt.Println(editPassenger)
+				fmt.Println("updated passenger", params["username"])
 				defer db.Close()
 
 			} else {

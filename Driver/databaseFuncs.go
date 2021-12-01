@@ -44,3 +44,15 @@ func InsertDriver(db *sql.DB, username string, password string, firstname string
 		fmt.Println("Driver added")
 	}
 }
+
+func UpdateDriver(db *sql.DB, username string, password string, firstname string, lastname string, mobileno string, emailaddr string, nric string, carlicenseno string) {
+	query := fmt.Sprintf("UPDATE Driver SET D_Password = '%s', D_FirstName = '%s', D_LastName = '%s', D_MobileNo = '%s', D_EmailAddr = '%s', D_NRIC = '%s', D_CarLicenseNo = '%s' WHERE D_Username = '%s'", password, firstname, lastname, mobileno, emailaddr, nric, carlicenseno, username)
+
+	_, err := db.Query(query)
+
+	if err != nil {
+		panic(err.Error())
+	} else {
+		fmt.Println("Driver updated")
+	}
+}

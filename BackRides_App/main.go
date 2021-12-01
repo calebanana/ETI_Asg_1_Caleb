@@ -124,7 +124,7 @@ func driverEditAccount(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(currentDriver)
 	} else {
 		edit_driver_data := Driver{
-			D_Username:     r.FormValue("d_new_username"),
+			D_Username:     currentDriver.D_Username,
 			D_Password:     r.FormValue("d_new_password"),
 			D_FirstName:    r.FormValue("d_new_firstname"),
 			D_LastName:     r.FormValue("d_new_lastname"),
@@ -134,10 +134,55 @@ func driverEditAccount(w http.ResponseWriter, r *http.Request) {
 			D_CarLicenseNo: r.FormValue("d_new_carlicenseno"),
 		}
 
+		edit_driver_data_json, _ := json.Marshal(edit_driver_data)
+
+		request, err := http.NewRequest(http.MethodPut,
+			driverURL+"/"+edit_driver_data.D_Username,
+			bytes.NewBuffer(edit_driver_data_json))
+
+		request.Header.Set("Content-Type", "application/json")
+
+		client := &http.Client{}
+		response, err := client.Do(request)
+
+		fmt.Println("sent to driver")
+
+		if err != nil {
+			fmt.Printf("The HTTP request failed with error %s\n", err)
+		} else {
+			data, _ := ioutil.ReadAll(response.Body)
+			fmt.Println(response.StatusCode)
+			fmt.Println(string(data))
+			response.Body.Close()
+		}
+
 		currentDriver = edit_driver_data
-		fmt.Println(currentDriver)
-		//edit_passenger_data_json, _ := json.Marshal(edit_passenger_data)
+		http.Redirect(w, r, "/driver_main", http.StatusFound)
 	}
+}
+
+func driverDeleteAccount(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("delete start")
+
+	request, err := http.NewRequest(http.MethodDelete,
+		driverURL+"/"+currentDriver.D_Username,
+		nil)
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+
+	fmt.Println("sent to driver")
+
+	if err != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err)
+	} else {
+		data, _ := ioutil.ReadAll(response.Body)
+		fmt.Println(response.StatusCode)
+		fmt.Println(string(data))
+		response.Body.Close()
+	}
+
+	http.Redirect(w, r, "/driver_main", http.StatusFound)
 }
 
 func driverMain(w http.ResponseWriter, r *http.Request) {
@@ -154,7 +199,7 @@ func passengerNewAccount(w http.ResponseWriter, r *http.Request) {
 		tmpl.Execute(w, nil)
 	} else {
 		new_passenger_data := Passenger{
-			P_Username:  r.FormValue("p_username"),
+			P_Username:  currentPassenger.P_Username,
 			P_Password:  r.FormValue("p_password"),
 			P_FirstName: r.FormValue("p_firstname"),
 			P_LastName:  r.FormValue("p_lastname"),
@@ -235,10 +280,56 @@ func passengerEditAccount(w http.ResponseWriter, r *http.Request) {
 			P_EmailAddr: r.FormValue("p_new_emailaddr"),
 		}
 
+		edit_passenger_data_json, _ := json.Marshal(edit_passenger_data)
+
+		request, err := http.NewRequest(http.MethodPut,
+			passengerURL+"/"+edit_passenger_data.P_Username,
+			bytes.NewBuffer(edit_passenger_data_json))
+
+		request.Header.Set("Content-Type", "application/json")
+
+		client := &http.Client{}
+		response, err := client.Do(request)
+
+		fmt.Println("sent to passenger")
+
+		if err != nil {
+			fmt.Printf("The HTTP request failed with error %s\n", err)
+		} else {
+			data, _ := ioutil.ReadAll(response.Body)
+			fmt.Println(response.StatusCode)
+			fmt.Println(string(data))
+			response.Body.Close()
+		}
+
 		currentPassenger = edit_passenger_data
-		fmt.Println(currentPassenger)
-		//edit_passenger_data_json, _ := json.Marshal(edit_passenger_data)
+		http.Redirect(w, r, "/passenger_main", http.StatusFound)
 	}
+}
+
+func passengerDeleteAccount(w http.ResponseWriter, r *http.Request) {
+
+	request, err := http.NewRequest(http.MethodDelete,
+		passengerURL+"/"+currentPassenger.P_Username,
+		nil)
+
+	request.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+
+	fmt.Println("sent to passenger")
+
+	if err != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err)
+	} else {
+		data, _ := ioutil.ReadAll(response.Body)
+		fmt.Println(response.StatusCode)
+		fmt.Println(string(data))
+		response.Body.Close()
+	}
+
+	http.Redirect(w, r, "/passenger_main", http.StatusFound)
 }
 
 func passengerMain(w http.ResponseWriter, r *http.Request) {
@@ -256,11 +347,13 @@ func main() {
 	router.HandleFunc("/driver_new_account", driverNewAccount)
 	router.HandleFunc("/driver_login", driverLogin)
 	router.HandleFunc("/driver_edit_account", driverEditAccount)
+	router.HandleFunc("/driver_delete_account", driverDeleteAccount)
 	router.HandleFunc("/driver_main", driverMain)
 
 	router.HandleFunc("/passenger_new_account", passengerNewAccount)
 	router.HandleFunc("/passenger_login", passengerLogin)
 	router.HandleFunc("/passenger_edit_account", passengerEditAccount)
+	router.HandleFunc("/passenger_delete_account", passengerDeleteAccount)
 	router.HandleFunc("/passenger_main", passengerMain)
 
 	fmt.Println("Listening on port 3000")
