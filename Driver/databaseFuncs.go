@@ -7,8 +7,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func OpenDB() *sql.DB {
-	db, err := sql.Open("mysql", "root:E50Misweakaf@tcp(127.0.0.1:3306)/BackRidesDB")
+func OpenDB(database string) *sql.DB {
+	db, err := sql.Open("mysql", "root:E50Misweakaf@tcp(127.0.0.1:3306)/"+database+"DB")
 
 	if err != nil {
 		panic(err.Error())
@@ -22,7 +22,7 @@ func GetDriver(db *sql.DB, username string) Driver {
 	err := db.QueryRow("SELECT * FROM Driver WHERE D_Username = ?", username).Scan(&driver.D_Username, &driver.D_Password, &driver.D_FirstName, &driver.D_LastName, &driver.D_MobileNo, &driver.D_EmailAddr, &driver.D_NRIC, &driver.D_CarLicenseNo, &driver.D_IsAvailable)
 
 	if err != nil {
-		panic(err.Error())
+		return Driver{}
 	}
 	return driver
 }

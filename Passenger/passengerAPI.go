@@ -24,17 +24,29 @@ func passenger(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	if r.Method == "GET" {
+		//Get passenger record from database
 		kv := r.URL.Query()
 
-		db := OpenDB()
-		passenger_record := GetPassenger(db, params["username"])
+		passengerdb := OpenDB("Passenger")
+		passenger_record := GetPassenger(passengerdb, params["username"])
 
-		if passenger_record.P_Password == kv["password"][0] || kv["password"][0] == "bypass" {
-			json.NewEncoder(w).Encode(passenger_record)
+		if passenger_record.P_Username != "" {
+			//Username exists in database
+			if passenger_record.P_Password == kv["password"][0] || kv["password"][0] == "bypass" {
+				//Correct password
+				json.NewEncoder(w).Encode(passenger_record)
+			} else {
+				//Incorrect password
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte("401 - Unauthorised"))
+			}
 		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("401 - Unauthorised"))
+			//Username does not exist in database
+			//Encode empty passenger object
+			json.NewEncoder(w).Encode(passenger_record)
 		}
+
+		defer passengerdb.Close()
 	} else if r.Method == "DELETE" {
 		w.WriteHeader(http.StatusUnavailableForLegalReasons)
 		w.Write([]byte("451 - Unable to delete account for legal reasons"))
@@ -42,6 +54,7 @@ func passenger(w http.ResponseWriter, r *http.Request) {
 
 	if r.Header.Get("Content-type") == "application/json" {
 		if r.Method == "POST" {
+			//Add new passenger record
 			var newPassenger Passenger
 			reqBody, err := ioutil.ReadAll(r.Body)
 
@@ -49,21 +62,23 @@ func passenger(w http.ResponseWriter, r *http.Request) {
 				json.Unmarshal(reqBody, &newPassenger)
 
 				if newPassenger.P_Username == "" {
+					//No passenger object
 					w.WriteHeader(http.StatusUnprocessableEntity)
 					w.Write([]byte("422 - Please supply passenger information in JSON format"))
 					return
 				}
 
-				db := OpenDB()
-				InsertPassenger(db, newPassenger.P_Username, newPassenger.P_Password, newPassenger.P_FirstName, newPassenger.P_LastName, newPassenger.P_MobileNo, newPassenger.P_EmailAddr)
+				passengerdb := OpenDB("Passenger")
+				InsertPassenger(passengerdb, newPassenger.P_Username, newPassenger.P_Password, newPassenger.P_FirstName, newPassenger.P_LastName, newPassenger.P_MobileNo, newPassenger.P_EmailAddr)
 
-				defer db.Close()
+				defer passengerdb.Close()
 
 			} else {
 				w.WriteHeader(http.StatusUnprocessableEntity)
 				w.Write([]byte("422 - Please provide passenger information in JSON format"))
 			}
 		} else if r.Method == "PUT" {
+			//Update passenger record
 			var editPassenger Passenger
 			reqBody, err := ioutil.ReadAll(r.Body)
 
@@ -76,10 +91,10 @@ func passenger(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
-				db := OpenDB()
-				UpdatePassenger(db, editPassenger.P_Username, editPassenger.P_Password, editPassenger.P_FirstName, editPassenger.P_LastName, editPassenger.P_MobileNo, editPassenger.P_EmailAddr)
+				passengerdb := OpenDB("Passenger")
+				UpdatePassenger(passengerdb, editPassenger.P_Username, editPassenger.P_Password, editPassenger.P_FirstName, editPassenger.P_LastName, editPassenger.P_MobileNo, editPassenger.P_EmailAddr)
 
-				defer db.Close()
+				defer passengerdb.Close()
 
 			} else {
 				w.WriteHeader(http.StatusUnprocessableEntity)

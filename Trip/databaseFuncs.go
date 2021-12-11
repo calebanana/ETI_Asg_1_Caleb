@@ -7,10 +7,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func OpenDB() *sql.DB {
-	db, err := sql.Open("mysql", "root:E50Misweakaf@tcp(127.0.0.1:3306)/BackRidesDB")
+func OpenDB(database string) *sql.DB {
+	db, err := sql.Open("mysql", "root:E50Misweakaf@tcp(127.0.0.1:3306)/"+database+"DB")
 
-	// handle error
 	if err != nil {
 		panic(err.Error())
 	} else {
@@ -63,16 +62,19 @@ func GetPastTrips(db *sql.DB, passenger string) []Trip {
 }
 
 func InsertTrip(db *sql.DB, pickuplocation string, dropofflocation string, passenger string) {
-	query1 := fmt.Sprintf("INSERT INTO Trip (T_PickUpLocation, T_DropOffLocation, T_Passenger) VALUES ('%s', '%s', '%s')", pickuplocation, dropofflocation, passenger)
+	query := fmt.Sprintf("INSERT INTO Trip (T_PickUpLocation, T_DropOffLocation, T_Passenger) VALUES ('%s', '%s', '%s')", pickuplocation, dropofflocation, passenger)
 
-	_, err := db.Query(query1)
+	_, err := db.Query(query)
 
 	if err != nil {
 		panic(err.Error())
 	}
+}
 
-	query2 := fmt.Sprintf("UPDATE Passenger SET P_ActiveTrip = TRUE WHERE P_Username = '%s'", passenger)
-	_, err = db.Query(query2)
+func ChangePassengerActiveTrip(db *sql.DB, passenger string, activetrip int) {
+	query := fmt.Sprintf("UPDATE Passenger SET P_ActiveTrip = '%d' WHERE P_Username = '%s'", activetrip, passenger)
+
+	_, err := db.Query(query)
 
 	if err != nil {
 		panic(err.Error())
@@ -84,7 +86,7 @@ func AssignDriver(db *sql.DB) Driver {
 	err := db.QueryRow("SELECT * FROM Driver WHERE D_IsAvailable = TRUE LIMIT 1").Scan(&availDriver.D_Username, &availDriver.D_Password, &availDriver.D_FirstName, &availDriver.D_LastName, &availDriver.D_MobileNo, &availDriver.D_EmailAddr, &availDriver.D_NRIC, &availDriver.D_CarLicenseNo, &availDriver.D_IsAvailable)
 
 	if err != nil {
-		panic(err.Error())
+		return Driver{}
 	}
 	return availDriver
 }
@@ -119,16 +121,6 @@ func AddStartTimeToTrip(db *sql.DB, startdatetime string, passenger string) {
 
 func AddEndTimeToTrip(db *sql.DB, enddatetime string, passenger string) {
 	query := fmt.Sprintf("UPDATE Trip SET T_EndDateTime = '%s' WHERE T_Passenger = '%s' ORDER BY T_ID DESC LIMIT 1", enddatetime, passenger)
-	_, err := db.Query(query)
-
-	if err != nil {
-		panic(err.Error())
-	}
-}
-
-func ChangePassengerActiveTrip(db *sql.DB, passenger string) {
-	query := fmt.Sprintf("UPDATE Passenger SET P_ActiveTrip = FALSE WHERE P_Username = '%s'", passenger)
-
 	_, err := db.Query(query)
 
 	if err != nil {

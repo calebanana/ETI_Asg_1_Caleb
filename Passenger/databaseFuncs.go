@@ -7,8 +7,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func OpenDB() *sql.DB {
-	db, err := sql.Open("mysql", "root:E50Misweakaf@tcp(127.0.0.1:3306)/BackRidesDB")
+func OpenDB(database string) *sql.DB {
+	db, err := sql.Open("mysql", "root:E50Misweakaf@tcp(127.0.0.1:3306)/"+database+"DB")
 
 	if err != nil {
 		panic(err.Error())
@@ -22,7 +22,7 @@ func GetPassenger(db *sql.DB, username string) Passenger {
 	err := db.QueryRow("SELECT * FROM Passenger WHERE P_Username = ?", username).Scan(&passenger.P_Username, &passenger.P_Password, &passenger.P_FirstName, &passenger.P_LastName, &passenger.P_MobileNo, &passenger.P_EmailAddr, &passenger.P_ActiveTrip)
 
 	if err != nil {
-		panic(err.Error())
+		return Passenger{}
 	}
 	return passenger
 }

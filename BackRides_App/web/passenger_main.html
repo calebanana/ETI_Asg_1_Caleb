@@ -8,7 +8,6 @@
 </head>
 <body>
     <h1>Welcome, {{.P_FirstName}} {{.P_LastName}}</h1>
-    <h1>{{.P_ActiveTrip}}</h1>
     {{if .P_ActiveTrip}}
     <a href="/passenger_edit_account">
         <button disabled>Edit Account Details</button>
@@ -25,6 +24,9 @@
     <a href="/passenger_past_trips">
         <button>View Past Trips</button>
     </a>
+    <br><br>
+    <a href="/">
+        <button>Log Out</button>
     {{else}}
     <a href="/passenger_edit_account">
         <button>Edit Account Details</button>
@@ -41,6 +43,9 @@
     <a href="/passenger_past_trips">
         <button>View Past Trips</button>
     </a>
+    <br><br>
+    <a href="/">
+        <button>Log Out</button>
     {{end}}
 </body>
 </html>
