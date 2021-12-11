@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackRides Passenger</title>
+</head>
+<body>
+    <h1>Welcome, {{.P_FirstName}} {{.P_LastName}}</h1>
+    <h1>{{.P_ActiveTrip}}</h1>
+    
+    <h2>New Trip</h2>
+    <form method="POST">
+        <label>Pick Up Location Postal Code</label> <br/>
+        <input name="t_pickuplocation" type="text"> <br/><br/>
+        <label>Drop Off Location Postal Code</label><br/>
+        <input name="t_dropofflocation" type="text"> <br/><br/>
+        <input type="submit">
+    </form>
+   
+    <br>
+    <a href="/passenger_main">
+        <button>Back to main page</button>
+    </a>
+</body>
+</html>

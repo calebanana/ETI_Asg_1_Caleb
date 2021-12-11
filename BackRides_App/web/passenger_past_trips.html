@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackRides Passenger</title>
+</head>
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 20px;
+    }
+    td {
+        text-align: center;
+    }
+</style>
+<body>
+    <h1>Welcome, {{.passenger.P_FirstName}} {{.passenger.P_LastName}}</h1>
+    <h2>Past Trips</h2>
+
+    <table>
+        <tr>
+            <th>Trip Start</th>
+            <th>Trip End</th>
+            <th>Pick Up</th>
+            <th>Drop Off</th>
+            <th>Driver</th>
+        </tr>
+        {{ with .trips }}
+          {{ range . }}
+                <tr>
+                    <td>{{.T_StartDateTime}}</td>
+                    <td>{{.T_EndDateTime}}</td>
+                    <td>{{.T_PickUpLocation}}</td>
+                    <td>{{.T_DropOffLocation}}</td>
+                    <td>{{.T_Driver}}</td>
+                </tr>
+          {{ end }}
+        {{ else }}
+                <h3>No past trips</h3>
+        {{ end }}
+  </table>
+  <br>
+  <a href="/passenger_main">
+    <button>Back to main page</button>
+</a>
+    
+</body>
+</html>

@@ -8,6 +8,8 @@
 </head>
 <body>
     <h1>Welcome, {{.D_FirstName}} {{.D_LastName}}</h1>
+    <h1>{{.D_IsAvailable}}</h1>
+    {{if .D_IsAvailable}}
     <a href="/driver_edit_account">
         <button>Edit Account Details</button>
     </a>
@@ -15,5 +17,18 @@
     <a href="/driver_delete_account">
         <button>Delete Account</button>
     </a>
+    {{else}}
+    <a href="/driver_edit_account">
+        <button disabled>Edit Account Details</button>
+    </a>
+    <br><br>
+    <a href="/driver_delete_account">
+        <button disabled>Delete Account</button>
+    </a>
+    <br><br>
+    <a href="/driver_confirmed_trip">
+        <button>View Trip</button>
+    </a>
+    {{end}}
 </body>
 </html>

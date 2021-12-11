@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackRides Passenger</title>
+</head>
+<body>
+    <h1>Welcome, {{.P_FirstName}} {{.P_LastName}}</h1>
+    <h1>{{.P_ActiveTrip}}</h1>
+    {{if .P_ActiveTrip}}
+    <a href="/passenger_edit_account">
+        <button disabled>Edit Account Details</button>
+    </a>
+    <br><br>
+    <a href="/passenger_delete_account">
+        <button disabled>Delete Account</button>
+    </a>
+    <br><br>
+    <a href="/passenger_confirmed_trip">
+        <button>View Current Trip</button>
+    </a>
+    <br><br>
+    <a href="/passenger_past_trips">
+        <button>View Past Trips</button>
+    </a>
+    {{else}}
+    <a href="/passenger_edit_account">
+        <button>Edit Account Details</button>
+    </a>
+    <br><br>
+    <a href="/passenger_delete_account">
+        <button>Delete Account</button>
+    </a>
+    <br><br>
+    <a href="/passenger_new_trip">
+        <button>Start Trip</button>
+    </a>
+    <br><br>
+    <a href="/passenger_past_trips">
+        <button>View Past Trips</button>
+    </a>
+    {{end}}
+</body>
+</html>

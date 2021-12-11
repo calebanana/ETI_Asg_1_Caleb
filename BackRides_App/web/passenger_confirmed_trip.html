@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackRides Passenger</title>
+</head>
+<body>
+    <h1>Hi, {{.passenger.P_FirstName}} {{.passenger.P_LastName}}!</h1>
+    <h2>Your driver is on the way!</h1>
+    
+    <hr>
+
+    <h1>Driver Details</h2>
+    <h3>Name: {{.driver.D_FirstName}} {{.driver.D_LastName}}</h3>
+    <h3>Mobile No.: {{.driver.D_MobileNo}}</h3>
+    <h3>Car License No.: {{.driver.D_CarLicenseNo}}</h3>
+
+    <a href="/passenger_main">
+        <button>Back to main page</button>
+    </a>
+</body>
+</html>

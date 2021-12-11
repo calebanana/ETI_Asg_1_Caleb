@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackRides Driver</title>
+</head>
+<body>
+    <h1>Hi, {{.driver.D_FirstName}} {{.driver.D_LastName}}!</h1>
+    <h2>Here is your passenger!</h1>
+    
+    <hr>
+
+    <h1>Passenger Details</h2>
+    <h3>Name: {{.passenger.P_FirstName}} {{.passenger.P_LastName}}</h3>
+    <h3>Mobile No.: {{.passenger.P_MobileNo}}</h3>
+    <h3>Pick Up Postal Code: {{.trip.T_PickUpLocation}}</h3>
+    <h3>Drop Off Postal Code: {{.trip.T_DropOffLocation}}</h3>
+    {{if eq .trip.T_StartDateTime ""}}
+    <a href="/driver_start_trip">
+        <button>Start Trip</button>
+    </a>
+    <a href="/driver_end_trip">
+        <button disabled>End Trip</button>
+    </a>
+    {{end}}
+    {{if and (ne .trip.T_StartDateTime "") (eq .trip.T_EndDateTime "")}}
+    <h3>Trip Start: {{.trip.T_StartDateTime}}</h3>
+    <a href="/driver_start_trip">
+        <button disabled>Start Trip</button>
+    </a>
+    <a href="/driver_end_trip">
+        <button>End Trip</button>
+    </a>
+    {{end}}
+
+    {{if and (ne .trip.T_StartDateTime "") (ne .trip.T_EndDateTime "")}}
+    <h3>Trip Start: {{.trip.T_StartDateTime}}</h3>
+    <h3>Trip End: {{.trip.T_EndDateTime}}</h3>
+    <a href="/driver_start_trip">
+        <button disabled>Start Trip</button>
+    </a>
+    <a href="/driver_end_trip">
+        <button disabled>End Trip</button>
+    </a>
+    {{end}}
+    <br><br>
+
+    <a href="/driver_main">
+        <button>Back to main page</button>
+    </a>
+</body>
+</html>

