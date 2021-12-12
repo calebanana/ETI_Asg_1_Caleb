@@ -15,7 +15,7 @@ Within the User Account context, ambiguities may arise when the word "account" i
 
 ![User Account Context](BackRides_App/images/user_account_context.png)
 
-### **Step 3/4: Define Entities, Domain Services and Domain Events**
+### **Step 3/4: Define Entities and Domain Services]**
 
 In the third step, Tactical DDD is applied to identify the entities and domain services.
 
