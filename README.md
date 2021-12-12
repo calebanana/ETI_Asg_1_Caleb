@@ -23,7 +23,7 @@ The diagram below shows the microservice architecture that I have came up with a
 
 For each of the three microservices, they are able to read, write and update data onto their respective databases, implemented with MySQL.
 
-![Architecture Diagram](BackRides_App\images\architecture_diagram.png)
+![Architecture Diagram](BackRides_App/images/architecture_diagram.png)
 
 ## 4. Set-Up Instructions
 1. Clone the Git repository.

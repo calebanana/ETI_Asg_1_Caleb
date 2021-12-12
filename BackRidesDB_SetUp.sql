@@ -1,6 +1,6 @@
-DROP DATABASE DriverDB;
-DROP DATABASE PassengerDB;
-DROP DATABASE TripDB;
+-- DROP DATABASE DriverDB;
+-- DROP DATABASE PassengerDB;
+-- DROP DATABASE TripDB;
 
 -- Driver Database
 CREATE DATABASE DriverDB;
